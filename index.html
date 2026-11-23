@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Campus Compass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: a Mumbai local-train station board. The homepage is a route with three stops (Rent, Eat, Study resources); each stop is a section below. */
+:root {
+  --bg: #f2f5f8;
+  --card: #ffffff;
+  --ink: #0f1e33;
+  --muted: #4d6078;
+  --line: #cfd9e4;
+  --board: #123a6b;
+  --on-board: #ffffff;
+  --on-board-soft: #c9d8ec;
+  --signal: #f2b705;
+  --on-signal: #1a1400;
+  --link: #0b4a9e;
+  --f-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a1420; --card: #111f31; --ink: #e6edf5; --muted: #9db0c6; --line: #22344b;
+    --board: #16457f; --signal: #f5c431; --link: #8ebbf5; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a1420; --card: #111f31; --ink: #e6edf5; --muted: #9db0c6; --line: #22344b;
+  --board: #16457f; --signal: #f5c431; --link: #8ebbf5; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--f-body); font-size: 17px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+}
+a { color: var(--link); }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 700; line-height: 1.02; margin: 0; text-wrap: balance; letter-spacing: 0.005em; }
+p { margin: 0; }
+.mono { font-family: var(--f-mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* header */
+header.top { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; justify-content: space-between; padding-block: 18px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-weight: 700; font-size: 26px; text-decoration: none; color: var(--ink); }
+.brand-mark { width: 30px; height: 30px; border-radius: 50%; background: var(--board); display: grid; place-items: center; }
+.brand-mark::after { content: ""; width: 12px; height: 12px; border-radius: 50%; background: var(--signal); }
+.brand-block { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.brand-sub { display: flex; flex-wrap: wrap; gap: 2px 16px; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+.brand-sub a { color: var(--muted); text-decoration: none; }
+.brand-sub a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--signal); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+nav.main { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-left: auto; justify-content: flex-end; }
+nav.main a { color: var(--ink); text-decoration: none; font-weight: 500; padding: 4px 0; border-bottom: 2px solid transparent; }
+nav.main a:hover { border-bottom-color: var(--signal); }
+
+/* hero */
+.hero { background: var(--board); color: var(--on-board); border-radius: 6px; padding: clamp(24px, 5vw, 56px); }
+.hero .mono { color: var(--on-board-soft); }
+.hero h1 { font-size: clamp(44px, 8.5vw, 92px); text-transform: uppercase; margin-top: 14px; max-width: 12ch; }
+.hero h1 span { color: var(--signal); }
+.hero .lede { margin-top: 18px; max-width: 52ch; font-size: 19px; color: var(--on-board-soft); }
+.hero .lede b { color: var(--on-board); font-weight: 600; }
+
+.route { list-style: none; margin: clamp(28px, 5vw, 48px) 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); position: relative; }
+.route::before { content: ""; position: absolute; left: 0; right: 0; top: 11px; height: 6px; background: var(--signal); border-radius: 3px; }
+.route li { position: relative; padding-top: 36px; padding-right: 16px; min-width: 0; }
+.route li::before { content: ""; position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--board); border: 6px solid var(--on-board); }
+.route a { display: block; text-decoration: none; color: var(--on-board); }
+.route .stop { font-family: var(--f-display); font-size: clamp(26px, 4vw, 38px); font-weight: 700; text-transform: uppercase; line-height: 1; }
+.route .what { display: block; margin-top: 6px; color: var(--on-board-soft); font-size: 15px; line-height: 1.4; }
+.route a:hover .stop { color: var(--signal); }
+.route a:focus-visible { outline-color: var(--on-board); }
+
+/* sections */
+section.stop-section { padding-block: clamp(40px, 7vw, 76px) 0; }
+.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 12px 40px; align-items: end; margin-bottom: 26px; }
+.sign { display: inline-flex; align-items: center; gap: 10px; background: var(--signal); color: var(--on-signal); font-family: var(--f-display); font-weight: 700; font-size: 20px; text-transform: uppercase; padding: 2px 12px; border-radius: 3px; width: fit-content; }
+.sec-head h2 { font-size: clamp(34px, 5vw, 54px); margin-top: 12px; }
+.sec-head p { color: var(--muted); max-width: 52ch; }
+.kicker { margin-top: 10px; color: var(--muted); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { font: inherit; font-size: 15px; font-weight: 500; color: var(--ink); background: transparent; border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 15px; cursor: pointer; }
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card h3 { font-size: 26px; }
+.card .meta { color: var(--muted); font-size: 15px; }
+.note { margin-top: 16px; color: var(--muted); font-size: 15px; max-width: 70ch; }
+
+.open { display: inline-flex; align-items: center; gap: 8px; background: var(--ink); color: var(--bg); text-decoration: none; font: inherit; font-weight: 600; padding: 10px 18px; border: 0; border-radius: 4px; cursor: pointer; }
+.open:hover { background: var(--board); color: var(--on-board); }
+.panel { margin-top: 22px; }
+
+/* study resources */
+.sem { text-decoration: none; color: var(--ink); }
+.sem .meta { font-family: var(--f-mono); font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--link); }
+.sem:hover { border-color: var(--ink); }
+
+/* broker table */
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; min-width: 700px; font-size: 15px; }
+thead th { text-align: left; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 12px 16px; border-bottom: 2px solid var(--ink); }
+tbody tr.grp th { text-align: left; background: var(--signal); color: var(--on-signal); font-family: var(--f-display); font-size: 20px; text-transform: uppercase; padding: 4px 16px; }
+tbody td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+.bname { display: block; font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.1; }
+.bsub { display: block; margin-top: 4px; color: var(--muted); font-size: 14px; line-height: 1.4; }
+.na { color: var(--muted); }
+.back { display: inline-block; margin-bottom: 20px; font-family: var(--f-mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); text-decoration: none; }
+.back:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--signal); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.tab { font: inherit; font-weight: 600; font-size: 16px; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); border-radius: 4px; padding: 8px 16px; cursor: pointer; }
+.tab:hover { background: var(--card); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tp-h { font-size: clamp(28px, 4vw, 36px); }
+.tp-d { color: var(--muted); margin: 6px 0 16px; }
+table.t-narrow { min-width: 0; }
+table.t-narrow td { vertical-align: middle; }
+table.t-narrow td:last-child, table.t-narrow thead th:last-child { width: 9rem; white-space: nowrap; }
+.ph { font-family: var(--f-mono); font-size: 14px; white-space: nowrap; display: block; }
+.more { margin-top: 14px; color: var(--muted); font-size: 15px; }
+
+/* contact + about */
+.contact { margin-top: clamp(40px, 7vw, 76px); background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 4vw, 32px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px 40px; align-items: center; }
+.contact h2 { font-size: clamp(30px, 4vw, 42px); }
+.contact p { color: var(--muted); }
+.contact dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 15px; }
+.contact dt { color: var(--muted); }
+.contact dd { margin: 0; font-family: var(--f-mono); font-size: 14px; overflow-wrap: anywhere; }
+.about { margin-top: clamp(48px, 8vw, 90px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 20px 40px; border-top: 2px solid var(--ink); padding-top: 28px; }
+.about h2 { font-size: clamp(32px, 4.5vw, 46px); }
+.about h3 { font-size: clamp(24px, 3.2vw, 32px); margin-bottom: 14px; }
+.about p + p { margin-top: 12px; }
+.about p { color: var(--muted); max-width: 60ch; }
+.about p b { color: var(--ink); font-weight: 600; }
+
+footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; gap: 6px 24px; justify-content: space-between; }
+
+@media (max-width: 720px) {
+  .sec-head, .about, .contact { grid-template-columns: minmax(0, 1fr); }
+  .route { grid-template-columns: minmax(0, 1fr); gap: 22px; padding-left: 0; }
+  .route::before { left: 11px; right: auto; top: 0; bottom: 0; width: 6px; height: auto; }
+  .route li { padding: 0 0 0 44px; }
+  .route li::before { top: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card, .chip, .open { transition: border-color .15s, background .15s; }
+  .card:hover { border-color: var(--ink); }
+}
+[hidden]{display:none!important}
+body{margin:0}
+img{max-width:100%}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand-block">
+      <a class="brand" href="#top" id="top"><span class="brand-mark" aria-hidden="true"></span>Campus Compass</a>
+      <p class="brand-sub"><a href="#rent">Contact Brokers</a><a href="#eat">Cafés nearby</a><a href="#studies">Study resources</a></p>
+    </div>
+    <nav class="main" aria-label="Main">
+      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="h1" data-home>
+      <p class="mono">NMIMS student community · Mumbai</p>
+      <h1 id="h1">New to Mumbai? <span>Start here.</span></h1>
+      <p class="lede">A room you can afford, food near campus and practice papers for every semester, collected by NMIMS students for NMIMS students. <b>About 8 in 10 of us moved here from another city</b> and knew nobody.</p>
+      <ol class="route" aria-label="Where to go first">
+        <li><a href="#rent"><span class="stop">Rent</span><span class="what">Broker contacts and budget areas around the city</span></a></li>
+        <li><a href="#eat"><span class="stop">Eat</span><span class="what">Cafes and restaurants near college</span></a></li>
+        <li><a href="#studies"><span class="stop">Study resources</span><span class="what">One stop for practice papers, semester by semester</span></a></li>
+      </ol>
+    </section>
+
+    <section class="stop-section" id="rent" aria-labelledby="rent-h" hidden>
+      <a class="back" href="#top">← Back to home</a>
+      <div class="sec-head">
+        <div><span class="sign">Rent</span><h2 id="rent-h">Find a room without a local contact</h2></div>
+        <p>Rental brokers in Juhu and Andheri, with website, directions and phone number where one was listed. Pick an area to narrow the list.</p>
+      </div>
+      <div class="panel" id="rent-panel">
+        <div class="chips" role="group" aria-label="Filter by area">
+          <button class="chip" type="button" data-area="all" aria-pressed="true">All areas</button>
+          <button class="chip" type="button" data-area="Juhu" aria-pressed="false">Juhu</button>
+          <button class="chip" type="button" data-area="Andheri" aria-pressed="false">Andheri</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th scope="col">Broker name</th><th scope="col">Website</th><th scope="col">Directions</th><th scope="col">Contact</th></tr>
+            </thead>
+
+            <tbody data-area="Juhu">
+              <tr class="grp"><th colspan="4" scope="colgroup">Juhu brokers &amp; consultants</th></tr>
+              <tr>
+                <td><span class="bname">SDG Realty - Shailesh Doshi Group</span><span class="bsub">Real estate agent · Sahyadri CHS, D.N. Nagar, Andheri West (near Juhu) · 4.9 (111)</span></td>
+                <td><a href="http://www.sdgrealty.in/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//Ground+Floor,+Sahyadri+CHS,+37%2F1468,+next+to+The+Club,+Shanti+Nagar,+D.N.Nagar,+Andheri+West,+Mumbai,+Maharashtra+400053/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c9de65649865:0x9ee56fe2316a863?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="ph">+91 90292 91424</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">Geeta Estate Consultant</span><span class="bsub">Real estate consultant · Sutari House, AB Nair Road, Juhu · 4.9 (25)</span></td>
+                <td><a href="https://www.geetaestate.com/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//Sutari+House,+AB+Nair+Rd,+near+Juhu+Post+Office,+Jukarwadi,+Juhu,+Mumbai,+Maharashtra+400049/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c9e9ba786673:0x7155db8d5a18fcb8?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">Ved Realtors</span><span class="bsub">Real estate consultant · Juhu Tara Road, Juhu · 4.9 (64)</span></td>
+                <td><span class="na">Not listed</span></td>
+                <td><a href="https://www.google.com/maps/dir//A+Wing,+31,+3rd+floor,+Udadhi+Tarang,+apartments,+Juhu+Tara+Rd,+Uditi+Tarang+Housing+Colony,+Juhu+Tara,+Juhu,+Mumbai,+Maharashtra+400049/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c997dc11e36d:0xa49ada0f36748086?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">Real Estate Juhu - Parikh Properties</span><span class="bsub">Real estate consultant · Gulmohar Road, Juhu · covers Juhu, Vile Parle and Andheri · 5.0 (15)</span></td>
+                <td><a href="http://www.parikhproperties.in/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//4R8J%2BH4P,+U.P,+Gulmohar+Road,+Gulmohar+Colony,+Juhu,+Mumbai,+Maharashtra+400049/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c9c67e22b2e1:0x68e55f103c4c1124?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">Tejasvi Realty</span><span class="bsub">Real estate agent · Swastik Plaza, Vaikunthlal Mehta Rd, Vile Parle West · 4.9 (179)</span></td>
+                <td><a href="https://tejasvirealty.com/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//V+L,+Swastik+Plaza,+06,+Vaikunthlal+Mehta+Rd,+Yamuna+Nagar,+Nehru+Nagar,+Airport+Area,+Vile+Parle+West,+Mumbai,+Maharashtra+400049/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c9c44c7bb0d3:0x20f2a8b8dfad128c?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+            </tbody>
+
+            <tbody data-area="Andheri">
+              <tr class="grp"><th colspan="4" scope="colgroup">Andheri brokers &amp; consultants</th></tr>
+              <tr>
+                <td><span class="bname">Navin Yadav (Workway Properties)</span><span class="bsub">Real estate agency · Vishal Apartments, Andheri East · flat rentals with transparent cost breakdowns · 5.0 (243)</span></td>
+                <td><a href="https://youtube.com/channel/UCatGcOf0Fa0ElN0HxkqJeTg" target="_blank" rel="noopener noreferrer">YouTube channel ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//gala+No+1,+Vishal+Apartments,+opp.+I+wing,+Workway+properties,+Andheri+East,+Mumbai,+Maharashtra+400069/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c96e9f2bee8b:0x4821adfa4f3e4fd7?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="ph">+91 88981 82369</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">Meena Properties</span><span class="bsub">Real estate consultant · Metro Saurabh Building, A.K Road, Chakala, Andheri East · rentals, sales and PGs · 4.9 (57)</span></td>
+                <td><a href="https://g.co/kgs/cEKX22" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//Metro+Saurabh+Building,+A.K+Road,+opposite+Domino's+Pizza,+Dr.+Charatsingh+Colony,+S+B+Singh+Colony,+Chakala,+Andheri+East,+Mumbai,+Maharashtra+400093/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7c97d438730ab:0x5c0698a5334731d8?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="ph">+91 77108 54044</span><span class="ph">+91 84250 28166</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">Laxmi Kripa Estate Agency</span><span class="bsub">Real estate agency · Laxmi Plaza, Link Road, Andheri West · 5.0 (108)</span></td>
+                <td><a href="https://laxmikripaestateagency.in/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//Shop+no+46,+Laxmi+Plaza,+Link+Rd,+Andheri,+Laxmi+Industrial+Estate,+Suresh+Nagar,+Andheri+West,+Mumbai,+Maharashtra+400053/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7b7f4d38a3e5f:0xa7cd1fbe6ce10b9c?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">R.R. Associates Estate Consultants</span><span class="bsub">Real estate agent · Nimbus Centre, Off New Link Road, Andheri West · 4.8 (21)</span></td>
+                <td><a href="http://www.andheriprojects.com/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//Shop+No.+18,+Nimbus+Centre+Raviraj+Oberoi+Complex,+Vastu+Lane,+Off+New+Link+Rd,+near+Empressa+Hotel,+Andheri+West,+Mumbai,+Maharashtra+400053/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7b6165eda5eef:0xfad74a0eb7b7615e?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+              <tr>
+                <td><span class="bname">AB Real Estate Consultant</span><span class="bsub">Real estate agency · Royal Sands, behind City Mall, Shastri Nagar, Andheri West · 4.9 (122)</span></td>
+                <td><a href="http://abrealestate.in/" target="_blank" rel="noopener noreferrer">Website ↗</a></td>
+                <td><a href="https://www.google.com/maps/dir//ROYAL+SANDS,+behind+CITY+MALL,+Phase+D,+Shastri+Nagar,+Andheri+West,+Mumbai,+Maharashtra+400053/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x3be7b72f81f78bf5:0xd1e04be8373f07c8?entry=s&amp;ved=1t:269504&amp;ictx=111" target="_blank" rel="noopener noreferrer">Directions ↗</a></td>
+                <td><span class="na">Not listed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="more">More listings: <a href="https://www.thepropertist.com/agent/real-estate-agents-brokers-in-juhu" target="_blank" rel="noopener noreferrer">The Propertist</a>, <a href="https://www.justdial.com/Mumbai/Estate-Agents-For-Residence-in-Juhu/nct-10192821" target="_blank" rel="noopener noreferrer">Justdial</a> and <a href="https://www.realestateindia.com/agents-brokers-in-juhu-mumbai.htm?page=10" target="_blank" rel="noopener noreferrer">RealEstateIndia</a>.</p>
+        <p class="note">Contact shows a number only where the listing had one. Compare brokerage terms between a few brokers before you pay anything.</p>
+      </div>
+    </section>
+
+    <section class="stop-section" id="eat" aria-labelledby="eat-h" hidden>
+      <a class="back" href="#top">← Back to home</a>
+      <div class="sec-head">
+        <div><span class="sign">Eat</span><h2 id="eat-h">Where students actually eat near college</h2></div>
+        <p>Cafes and restaurants picked for what a student needs: a cheap meal, a table to study at, food after a late lab.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Eat categories">
+        <button class="tab" type="button" role="tab" id="tab-meals" data-tab="meals" aria-selected="true" aria-controls="tp-meals">Meals under ₹150</button>
+        <button class="tab" type="button" role="tab" id="tab-study" data-tab="study" aria-selected="false" aria-controls="tp-study">Study-friendly cafes</button>
+        <button class="tab" type="button" role="tab" id="tab-chai" data-tab="chai" aria-selected="false" aria-controls="tp-chai">Chai and quick bites</button>
+        <button class="tab" type="button" role="tab" id="tab-late" data-tab="late" aria-selected="false" aria-controls="tp-late">Late-night options</button>
+        <button class="tab" type="button" role="tab" id="tab-area" data-tab="area" aria-selected="false" aria-controls="tp-area">Cafés by area</button>
+      </div>
+
+      <div class="tabpanel" id="tp-meals" role="tabpanel" aria-labelledby="tab-meals">
+        <h3 class="tp-h">Meals under ₹150</h3>
+        <p class="tp-d">Affordable, filling options for everyday student meals.</p>
+        <div class="table-wrap">
+          <table class="t-narrow">
+            <thead><tr><th scope="col">Cafe / Restaurant</th><th scope="col">What to try</th><th scope="col">Directions</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bname">GR Jani Canteen</span></td><td>Thalis, full meals, snacks</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=GR+Jani+Canteen+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Anand Stall</span></td><td>Dosas, sandwiches, vada pav</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Anand+Stall+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Amar Juice Centre</span></td><td>Pav bhaji, idli, sandwiches</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Amar+Juice+Centre+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Sharma Chat Bhandar</span></td><td>Chaat, pani puri, snacks</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Sharma+Chat+Bhandar+JVPD" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">VJ Cafe</span></td><td>Flavoured fries, quick snacks</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=VJ+Cafe+JVPD+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">GR Jani is particularly relevant because it is a student-oriented canteen serving economical meals. Anand Stall and Amar Juice Centre are established student food stops.</p>
+      </div>
+
+      <div class="tabpanel" id="tp-study" role="tabpanel" aria-labelledby="tab-study" hidden>
+        <h3 class="tp-h">Study-friendly cafes</h3>
+        <p class="tp-d">Places where students can sit, work on assignments, have coffee and spend a few hours.</p>
+        <div class="table-wrap">
+          <table class="t-narrow">
+            <thead><tr><th scope="col">Cafe</th><th scope="col">Why consider it?</th><th scope="col">Directions</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bname">Blue Tokai Coffee Roasters</span></td><td>Specialty coffee, comfortable work-friendly setting</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Blue+Tokai+Vile+Parle+West" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Starbucks – Gulmohar Road</span></td><td>Wi-Fi, seating and laptop-friendly atmosphere</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Starbucks+Gulmohar+Road+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Cafe 2.0</span></td><td>Wi-Fi, student crowd and affordable food</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Cafe+2.0+JVPD+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Friends Bench All Day Cafe</span></td><td>Bookshelf, cosy atmosphere and budget-friendly snacks</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Friends+Bench+All+Day+Cafe+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">HasTea Irani Cafe</span></td><td>Calm setting, tea and a relaxed café atmosphere</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=HasTea+Irani+Cafe+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Best bets: Cafe 2.0 and Blue Tokai. Wi-Fi is listed for Cafe 2.0, while Blue Tokai is described as work-friendly. Confirm laptop policies and plug-point availability before planning a long session.</p>
+      </div>
+
+      <div class="tabpanel" id="tp-chai" role="tabpanel" aria-labelledby="tab-chai" hidden>
+        <h3 class="tp-h">Chai and quick bites</h3>
+        <p class="tp-d">For the 15–20-minute break between lectures.</p>
+        <div class="table-wrap">
+          <table class="t-narrow">
+            <thead><tr><th scope="col">Cafe / Stall</th><th scope="col">What to try</th><th scope="col">Directions</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bname">Nagori Maharashtra Tea Point</span></td><td>Cutting chai, bun maska, toast</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Nagori+Maharashtra+Tea+Point+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">HasTea Irani Cafe</span></td><td>Irani chai and snacks</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=HasTea+Irani+Cafe+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Anand Stall</span></td><td>Vada pav, dosa, sandwiches</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Anand+Stall+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Mahendra Sandwich Centre</span></td><td>Grilled sandwiches, bhel and chaat</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Mahendra+Sandwich+Centre+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Classic Coffees</span></td><td>Iced coffee, bubble coffee and teas</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Classic+Coffees+NMIMS+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Nagori is a particularly good fit for a traditional chai-and-bun-maska break, while Anand Stall is ideal for quick grab-and-go food.</p>
+      </div>
+
+      <div class="tabpanel" id="tp-late" role="tabpanel" aria-labelledby="tab-late" hidden>
+        <h3 class="tp-h">Late-night options</h3>
+        <p class="tp-d">For students looking for food after 10 PM, especially during assignment submissions and exam periods.</p>
+        <div class="table-wrap">
+          <table class="t-narrow">
+            <thead><tr><th scope="col">Cafe / Restaurant</th><th scope="col">What to try</th><th scope="col">Closing time (listed)</th><th scope="col">Directions</th></tr></thead>
+            <tbody>
+              <tr><td><span class="bname">Amar Juice Centre</span></td><td>Pav bhaji, butter idli, juices</td><td class="ph">3 AM</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Amar+Juice+Centre+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Khurshid Pav Bhaji All Night</span></td><td>Pav bhaji, tawa pulao</td><td class="ph">5 AM</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Khurshid+Pav+Bhaji+All+Night+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Till Next Time</span></td><td>Pizza, pasta, Chinese</td><td class="ph">4–5 AM</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Till+Next+Time+Juhu+Circle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Cafe 2.0</span></td><td>Burgers, wraps, fries</td><td class="ph">Midnight</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Cafe+2.0+JVPD" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Luuma House</span></td><td>Continental food, pizzas and more</td><td class="ph">1 AM</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Luuma+House+JVPD" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Starbucks – Gulmohar Road</span></td><td>Coffee and light bites</td><td class="ph">Midnight</td><td><a href="https://www.google.com/maps/search/?api=1&amp;query=Starbucks+Gulmohar+Road+Vile+Parle" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Closing times are as listed and can change, so check before you head out.</p>
+      </div>
+
+      <div class="tabpanel" id="tp-area" role="tabpanel" aria-labelledby="tab-area" hidden>
+        <h3 class="tp-h">Cafés by area</h3>
+        <p class="tp-d">More cafés and restaurants around Andheri and Juhu.</p>
+        <div class="chips" role="group" aria-label="Filter by area">
+          <button class="chip" type="button" data-area="all" aria-pressed="true">All areas</button>
+          <button class="chip" type="button" data-area="Andheri West" aria-pressed="false">Andheri West</button>
+          <button class="chip" type="button" data-area="Andheri East" aria-pressed="false">Andheri East</button>
+          <button class="chip" type="button" data-area="Juhu" aria-pressed="false">Juhu</button>
+        </div>
+        <div class="table-wrap">
+          <table class="t-narrow">
+            <thead>
+              <tr><th scope="col">Name</th><th scope="col">Directions</th></tr>
+            </thead>
+
+            <tbody data-area="Andheri West">
+              <tr class="grp"><th colspan="2" scope="colgroup">Andheri West</th></tr>
+              <tr><td><span class="bname">August Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=August+Cafe+Andheri+West+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Love &amp; Latte – Lokhandwala</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Love+and+Latte+Lokhandwala+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">The Homemade Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Homemade+Cafe+Oshiwara+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Leaping Windows – Versova</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Leaping+Windows+Versova+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Third Wave Coffee – Lokhandwala</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Third+Wave+Coffee+Lokhandwala+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">abcoffee – Versova</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=abcoffee+Versova+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Garden Court</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Garden+Court+Andheri+West+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Persian Darbar – Lokhandwala</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Persian+Darbar+Lokhandwala+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+
+            <tbody data-area="Andheri East">
+              <tr class="grp"><th colspan="2" scope="colgroup">Andheri East</th></tr>
+              <tr><td><span class="bname">Bombay to Barcelona Library Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Bombay+to+Barcelona+Library+Cafe+Marol+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Starbucks – MIDC</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Starbucks+Ackruti+Centre+Point+Andheri+East+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">The Punjabi's Kitchen &amp; Bar</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=The+Punjabis+Kitchen+Bar+JB+Nagar+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Starbucks – Gundavali</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Starbucks+Gundavali+Andheri+East+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+
+            <tbody data-area="Juhu">
+              <tr class="grp"><th colspan="2" scope="colgroup">Juhu</th></tr>
+              <tr><td><span class="bname">Prithvi Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Prithvi+Cafe+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Third Wave Coffee – Juhu</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Third+Wave+Coffee+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Silver Beach Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Silver+Beach+Cafe+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Bayleaf Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Bayleaf+Cafe+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Ettarra Coffee House</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Ettarra+Coffee+House+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Ananda Cafe</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Ananda+Cafe+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Aromas Cafe &amp; Bistro</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Aromas+Cafe+Bistro+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Tanatan – Kitchen &amp; Bar</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Tanatan+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Cream Centre – Juhu</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Cream+Centre+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+              <tr><td><span class="bname">Love &amp; Latte – Juhu</span></td><td><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Love+and+Latte+Juhu+Mumbai" target="_blank" rel="noopener noreferrer">Google Maps ↗</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="stop-section" id="studies" aria-labelledby="studies-h" hidden>
+      <a class="back" href="#top">← Back to home</a>
+      <div class="sec-head">
+        <div>
+          <span class="sign">Study resources</span>
+          <h2 id="studies-h">One stop for practice papers</h2>
+          <p class="mono kicker">Semester 1 to 5 · Google Drive folders</p>
+        </div>
+        <p>Pick your semester to open its folder of practice papers. Everything is shared by students who have already sat the exams.</p>
+      </div>
+      <div class="panel" id="studies-panel">
+        <div class="grid">
+          <a class="card sem" href="https://drive.google.com/drive/folders/1q2bU_CWWOrE8E3P_1WDy48t3VrX41VX5" target="_blank" rel="noopener noreferrer"><h3>Semester 1</h3><span class="meta">Open folder ↗</span></a>
+          <a class="card sem" href="https://drive.google.com/drive/folders/1oJCZXsktdR0aNTPbGvPLM8ChR_E_nddQ" target="_blank" rel="noopener noreferrer"><h3>Semester 2</h3><span class="meta">Open folder ↗</span></a>
+          <a class="card sem" href="https://drive.google.com/drive/folders/1goMSAZYpbnrWJbykqu6PqRwAekFZdAf-" target="_blank" rel="noopener noreferrer"><h3>Semester 3</h3><span class="meta">Open folder ↗</span></a>
+          <a class="card sem" href="https://drive.google.com/drive/folders/1vQ6OIpNu88jz-ieB2VfyFuHMJRwTWpKD" target="_blank" rel="noopener noreferrer"><h3>Semester 4</h3><span class="meta">Open folder ↗</span></a>
+          <a class="card sem" href="https://drive.google.com/drive/folders/1GxvvjXqKoLpvLlqh5bx4BcQBsXxEF9By" target="_blank" rel="noopener noreferrer"><h3>Semester 5</h3><span class="meta">Open folder ↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact" id="contact" aria-labelledby="contact-h" data-home>
+      <div>
+        <h2 id="contact-h">Contact</h2>
+        <p>Know a reliable broker or a good café, or have practice papers to share? Tell me and I will add it.</p>
+      </div>
+      <dl>
+        <dt>Email</dt><dd><a href="mailto:medhritishah@gmail.com">medhritishah@gmail.com</a></dd>
+        <dt>Instagram</dt><dd><a href="https://www.instagram.com/dhritiiiishah?fqnt=MWJ2amdlb2h4bW85dg%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">@dhritiiiishah</a></dd>
+      </dl>
+    </section>
+
+    <section class="about" id="about" aria-labelledby="about-h" data-home>
+      <h2 id="about-h">About us</h2>
+      <div>
+        <h3>Built by a Mumbaikar who wanted to make student life easier</h3>
+        <p>Having grown up in Mumbai, I knew the city well, but watching my classmates navigate student life here made me realise how overwhelming it could be. From finding affordable places to eat and reliable study spots to figuring out everyday student essentials, there was a lot of information scattered around, and not always someone to point you in the right direction.</p>
+        <p>I hope this little initiative makes student life in Mumbai a little easier by bringing helpful information, local recommendations and useful resources together in one place. If it saves someone time, helps them discover a new favourite spot or makes their college experience just a little smoother, it has served its purpose.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Campus Compass · made by Dhriti Shah, Student of NMIMS ASMSOC</span>
+    <span>An independent student project, not an official NMIMS website.</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var views = ['rent', 'eat', 'studies'];
+  function route() {
+    var h = location.hash.replace('#', '');
+    var isView = views.indexOf(h) > -1;
+    views.forEach(function (v) { document.getElementById(v).hidden = !(isView && v === h); });
+    document.querySelectorAll('[data-home]').forEach(function (el) { el.hidden = isView; });
+    var target = !isView && h ? document.getElementById(h) : null;
+    if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+  route();
+
+  var tabs = document.querySelectorAll('.tab');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        document.getElementById('tp-' + t.getAttribute('data-tab')).hidden = !on;
+      });
+    });
+  });
+
+  document.querySelectorAll('.panel').forEach(function (panel) {
+    var chips = panel.querySelectorAll('.chip');
+    var groups = panel.querySelectorAll('tbody[data-area]');
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var area = chip.getAttribute('data-area');
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+        groups.forEach(function (g) {
+          g.hidden = !(area === 'all' || g.getAttribute('data-area') === area);
+        });
+      });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
